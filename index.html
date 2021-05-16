@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Я создан, чтобы меня взломали</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <section>
+        <div class="box">
+          <div class="form">
+            <h2>Введите данные супер админа: </h2>
+            <form>
+                <div class="inputBx">
+                <!-- email: root -->
+                <input type="text" placeholder="Имя пользователя" id='email'>
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </div>
+              <div class="inputBx">
+                <!-- password: qwerty -->
+                <input type="password" placeholder="Пароль" id='password'>
+                <i class="fa fa-lock" aria-hidden="true"></i>
+              </div>
+            </form>
+            <div class="inputBx">
+                <button onclick={submit()} placeholder="Login">Отправить</button>
+              </div>
+          </div>
+        </div>
+      </section>
+</body>
+<script>
+    async function submit() {
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+        const url = 'http://localhost:5000/api/admin/login'
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Accept', 'application/json');
+        const options = {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ email, password })
+        }
+        let res = await fetch(url, options)
+        if (res.status == 200) {
+            window.location.replace("./admin.html");
+        }else{
+            alert('Ошибка, попробуйте снова :)')
+        }
+        return res
+    }
+</script>
+
+</html>

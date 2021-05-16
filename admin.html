@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Страница супер админа</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <section>
+        <div class="box">
+        <h1>Можете добавить сотрудника:</h1>
+        <form>
+            <p>
+                <input placeholder="ФИО" id='name' />
+            </p>
+            <p>
+                <input placeholder="Табельный номер" id='number' />
+            </p>
+            <p>
+                <input placeholder="Пароль" type="password" id='password' />
+            </p>
+        </form>
+        <p><button onclick={submit()}>Сохранить</button></p>
+        <h1>Сотрудники, которые имеют доступ к документам особой важности:</h1>
+        <div class="content"></div>
+        </div>
+    </section>
+</body>
+
+<script>
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    headers.append('Accept', 'application/json');
+    async function submit() {
+        let name = document.getElementById('name').value ? document.getElementById('name').value : ''
+        let number = document.getElementById('number').value ? document.getElementById('number').value : ''
+        let password = document.getElementById('password').value ? document.getElementById('password').value : ''
+        const url = 'http://localhost:5000/api/users/registration'
+        const options = {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ name: name, number: number, password: password })
+        }
+        let res = await fetch(url, options)
+        if (res.status == 200) {
+            getUsers()
+            document.getElementById('name').value = ''
+            document.getElementById('number').value = ''
+            document.getElementById('password').value = ''
+        } else {
+            alert('Ошибка, попробуйте снова :)')
+        }
+        return res
+    }
+    function getUsers() {
+        const url = 'http://localhost:5000/api/users/users'
+        let r
+        fetch(url).then(r => r.json()).then(users => addTable(users.sort(function (a, b) {
+            const nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase()
+            if (nameA < nameB) //сортируем строки по возрастанию
+                return -1
+            if (nameA > nameB)
+                return 1
+            return 0
+        })))
+
+    }
+    function addTable(users) {
+        document.querySelector('.content').innerHTML = `<table class="users"></table>`;
+        let row = document.createElement('tr');
+        row.insertAdjacentHTML('beforeend', `<td colspan="1">ФИО</td>`);
+        row.insertAdjacentHTML('beforeend', `<td colspan="1">Номер</td>`);
+        row.insertAdjacentHTML('beforeend', `<td colspan="1">Пароль</td>`);
+        document.querySelector('.users').append(row);
+        for (let item of users) {
+            let innerRow = document.createElement('tr');
+            innerRow.insertAdjacentHTML('beforeend', `<td>${item.name}</td>`)
+            innerRow.insertAdjacentHTML('beforeend', `<td>${item.number}</td>`)
+            innerRow.insertAdjacentHTML('beforeend', `<td>${item.password}</td>`)
+            document.querySelector('.users').append(innerRow);
+        }
+
+    }
+    getUsers()
+
+</script>
+
+</html>
